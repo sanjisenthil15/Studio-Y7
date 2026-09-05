@@ -1,6 +1,18 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getApiUrl = () => {
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL)
+    ? import.meta.env.VITE_API_URL
+    : (typeof process !== 'undefined' ? process.env?.VITE_API_URL : null);
+    
+  if (!envUrl || typeof envUrl !== 'string') {
+    return 'http://localhost:5000/api';
+  }
+  const cleanUrl = envUrl.replace(/^VITE_API_URL=/, '').trim();
+  return cleanUrl || 'http://localhost:5000/api';
+};
+
+const API_URL = getApiUrl();
 
 const api = axios.create({
   baseURL: API_URL,
@@ -8,8 +20,13 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
+  const token = (typeof window !== 'undefined')
+    ? (localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken'))
+    : null;
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 
@@ -19,11 +36,14 @@ export const authAPI = {
   getProfile: () => api.get('/auth/profile')
 };
 
+export const cloudinaryAPI = {
+  getSignature: (folder = 'studio-y7/gallery') => api.post('/cloudinary/signature', { folder })
+};
+
 export const galleryAPI = {
   getAll: () => api.get('/gallery'),
-  upload: (formData) => api.post('/gallery', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  upload: (data) => api.post('/gallery', data),
+  saveMetadata: (data) => api.post('/gallery', data),
   update: (id, data) => api.put(`/gallery/${id}`, data),
   delete: (id) => api.delete(`/gallery/${id}`),
   reorder: (data) => api.put('/gallery/reorder/all', data)
@@ -31,9 +51,8 @@ export const galleryAPI = {
 
 export const heroAPI = {
   get: () => api.get('/hero'),
-  upload: (formData) => api.post('/hero', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  upload: (data) => api.post('/hero', data),
+  saveMetadata: (data) => api.post('/hero', data),
   delete: (id) => api.delete(`/hero/${id}`)
 };
 
@@ -57,11 +76,27 @@ export const contactAPI = {
 
 export const testimonialAPI = {
   getAll: () => api.get('/testimonials'),
-  create: (formData) => api.post('/testimonials', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  getAdminAll: () => api.get('/testimonials/admin'),
+  submit: (formData) => api.post('/testimonials/submit', formData),
+  create: (formData) => api.post('/testimonials', formData),
   update: (id, data) => api.put(`/testimonials/${id}`, data),
   delete: (id) => api.delete(`/testimonials/${id}`)
+};
+
+export const serviceAPI = {
+  getAll: () => api.get('/services'),
+  getAdminAll: () => api.get('/services/admin'),
+  create: (data) => api.post('/services', data),
+  update: (id, data) => api.put(`/services/${id}`, data),
+  delete: (id) => api.delete(`/services/${id}`)
+};
+
+export const videoAPI = {
+  getAll: () => api.get('/videos'),
+  getAdminAll: () => api.get('/videos/admin'),
+  create: (data) => api.post('/videos', data),
+  update: (id, data) => api.put(`/videos/${id}`, data),
+  delete: (id) => api.delete(`/videos/${id}`)
 };
 
 export const pricingAPI = {
@@ -78,3 +113,4 @@ export const contentAPI = {
 };
 
 export default api;
+

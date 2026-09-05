@@ -1,7 +1,5 @@
 import Gallery from '../models/Gallery.js';
-import { cloudinary, isCloudinaryConfigured } from '../config/cloudinary.js';
-import fs from 'fs';
-import path from 'path';
+import { uploadToCloudinary, deleteFromCloudinary, isCloudinaryConfigured, getOptimizedDeliveryUrl } from '../config/cloudinary.js';
 
 export const getAllImages = async (req, res) => {
   try {
@@ -14,59 +12,71 @@ export const getAllImages = async (req, res) => {
 
 export const uploadImage = async (req, res) => {
   try {
-    // Check if file was uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file selected. Please choose an image to upload.' });
-    }
-
     const { title, category, featured } = req.body;
 
-    // Validate required fields
     if (!title || !category) {
-      if (req.file?.path) fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: 'Title and category are required' });
     }
 
-    let imageUrl, cloudinaryId;
+    // Direct client-side Cloudinary upload metadata
+    const directUrl = req.body.secure_url || req.body.imageUrl;
+    const directCloudinaryId = req.body.public_id || req.body.cloudinaryId;
 
-    // Use Cloudinary if configured, otherwise use local storage
-    if (isCloudinaryConfigured) {
-      try {
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: 'studio-y7/gallery'
+    if (directUrl && directCloudinaryId) {
+      console.log(`[Gallery Direct Metadata] Saving: "${title}" (${category}), ID: ${directCloudinaryId}`);
+
+      const image = await Gallery.create({
+        title,
+        imageUrl: directUrl,
+        cloudinaryId: directCloudinaryId,
+        category,
+        featured: featured === 'true' || featured === true
+      });
+
+      console.log(`[Gallery Direct Metadata] Successfully saved to MongoDB (ID: ${image._id})`);
+      return res.status(201).json(image);
+    }
+
+    // Fallback: If a file was sent via multipart/form-data
+    if (req.file) {
+      if (!isCloudinaryConfigured) {
+        return res.status(500).json({
+          message: 'Cloudinary is not configured. Please add CLOUDINARY credentials to backend/.env'
         });
-        imageUrl = result.secure_url;
-        cloudinaryId = result.public_id;
-        
-        // Delete local file after uploading to Cloudinary
-        fs.unlinkSync(req.file.path);
-      } catch (cloudinaryError) {
-        if (req.file?.path) fs.unlinkSync(req.file.path);
-        return res.status(500).json({ message: `Cloudinary upload failed: ${cloudinaryError.message}` });
       }
-    } else {
-      // Use local storage
-      const fileName = path.basename(req.file.path);
-      imageUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/gallery/${fileName}`;
-      cloudinaryId = fileName; // Use filename as ID for local storage
+
+      console.log(`[Gallery Server Upload Fallback] Processing: "${title}" (${category}), Size: ${(req.file.size / (1024 * 1024)).toFixed(2)} MB`);
+      
+      let result;
+      try {
+        result = await uploadToCloudinary(req.file.buffer, 'studio-y7/gallery');
+      } catch (uploadError) {
+        console.error('[Gallery Upload] Cloudinary upload failed:', uploadError.message || uploadError);
+        return res.status(500).json({ message: `Cloudinary upload failed: ${uploadError.message || 'Unknown error'}` });
+      }
+
+      try {
+        const image = await Gallery.create({
+          title,
+          imageUrl: result.secure_url,
+          cloudinaryId: result.public_id,
+          category,
+          featured: featured === 'true' || featured === true
+        });
+
+        console.log(`[Gallery Upload] Successfully saved to MongoDB (ID: ${image._id})`);
+        return res.status(201).json(image);
+      } catch (dbError) {
+        console.error('[Gallery Upload] MongoDB save failed, cleaning up Cloudinary asset:', result.public_id);
+        await deleteFromCloudinary(result.public_id);
+        return res.status(500).json({ message: `Database save failed: ${dbError.message}` });
+      }
     }
 
-    // Save to database
-    const image = await Gallery.create({
-      title,
-      imageUrl,
-      cloudinaryId,
-      category,
-      featured: featured === 'true' || featured === true
-    });
-
-    res.status(201).json(image);
+    return res.status(400).json({ message: 'No image data or file provided for upload.' });
   } catch (error) {
-    // Clean up file if it exists
-    if (req.file?.path && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-    res.status(500).json({ message: `Upload failed: ${error.message}` });
+    console.error('[Gallery Upload] Unexpected error:', error.message || error);
+    res.status(500).json({ message: `Upload failed: ${error.message || 'Unknown error'}` });
   }
 };
 
@@ -97,19 +107,8 @@ export const deleteImage = async (req, res) => {
       return res.status(404).json({ message: 'Image not found' });
     }
 
-    // Delete from Cloudinary or local storage
-    if (isCloudinaryConfigured) {
-      try {
-        await cloudinary.uploader.destroy(image.cloudinaryId);
-      } catch (cloudinaryError) {
-        console.error('Cloudinary delete error:', cloudinaryError);
-      }
-    } else {
-      // Delete local file
-      const filePath = path.join(process.cwd(), 'uploads', 'gallery', image.cloudinaryId);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+    if (image.cloudinaryId) {
+      await deleteFromCloudinary(image.cloudinaryId);
     }
 
     await image.deleteOne();
@@ -138,3 +137,4 @@ export const reorderImages = async (req, res) => {
     res.status(500).json({ message: `Reorder failed: ${error.message}` });
   }
 };
+

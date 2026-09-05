@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/y7.jpg";
 
 const NAV_LINKS = [
   { label: "About", href: "#about" },
@@ -36,14 +36,14 @@ export default function Navbar() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "top-4" : "top-8"}`}
+        className={`fixed left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "top-3 sm:top-4" : "top-4 sm:top-8"}`}
       >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <nav
-            className={`glass-strong soft-shadow-lg transition-all duration-500 ${scrolled ? "py-3" : "py-4"}`}
+            className={`glass-strong soft-shadow-lg transition-all duration-500 ${scrolled ? "py-2 sm:py-2.5 md:py-3" : "py-3 sm:py-3.5 md:py-4"}`}
             style={{ borderRadius: "24px", border: "1px solid rgba(107, 95, 90, 0.08)" }}
           >
-            <div className="flex items-center justify-between px-6">
+            <div className="flex items-center justify-between px-3 sm:px-6">
               {/* Logo */}
               <motion.a
                 href="#hero"
@@ -52,7 +52,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.98 }}
                 className="flex-shrink-0 cursor-pointer"
               >
-                <img src={logo} alt="Studio Y7" className="h-9 w-auto object-contain transition-all duration-500" />
+                <img src={logo} alt="Studio Y7" className="h-8 sm:h-9 md:h-10 w-auto object-contain mix-blend-multiply transition-all duration-500" />
               </motion.a>
 
               {/* Desktop Nav */}

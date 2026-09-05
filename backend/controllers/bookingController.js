@@ -12,7 +12,23 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 
 export const createBooking = async (req, res) => {
   try {
-    const booking = await Booking.create(req.body);
+    const bookingData = { ...req.body };
+    if (!bookingData.eventType && bookingData.serviceTitle) {
+      bookingData.eventType = bookingData.serviceTitle;
+    }
+    if (!bookingData.serviceTitle && bookingData.eventType) {
+      bookingData.serviceTitle = bookingData.eventType;
+    }
+    if (!bookingData.package && bookingData.packageName) {
+      bookingData.package = bookingData.packageName;
+    }
+    if (!bookingData.packageName && bookingData.package) {
+      bookingData.packageName = bookingData.package;
+    }
+    if (!bookingData.message && bookingData.notes) {
+      bookingData.message = bookingData.notes;
+    }
+    const booking = await Booking.create(bookingData);
     
     // Future ready: Send notifications here
     // await sendEmailNotification(booking);

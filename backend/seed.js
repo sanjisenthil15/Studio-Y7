@@ -1,19 +1,9 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import connectDB from './config/db.js';
 import Admin from './models/Admin.js';
 import SiteContent from './models/SiteContent.js';
 
 dotenv.config();
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB Connected');
-  } catch (error) {
-    console.error('Error:', error.message);
-    process.exit(1);
-  }
-};
 
 const seedData = async () => {
   await connectDB();

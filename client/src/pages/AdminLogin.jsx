@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { authAPI } from "../services/api";
 import { useAuthStore } from "../services/store";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/y7.jpg";
 import { FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
 
 export default function AdminLogin() {
@@ -29,15 +29,7 @@ export default function AdminLogin() {
 
     try {
       const { data } = await authAPI.login({ email, password });
-      setAuth(data, data.token);
-      
-      // Store token based on remember me
-      if (rememberMe) {
-        localStorage.setItem('adminToken', data.token);
-      } else {
-        sessionStorage.setItem('adminToken', data.token);
-      }
-      
+      setAuth(data, data.token, rememberMe);
       navigate("/admin/dashboard");
     } catch (err) {
       setError("Invalid Email or Password");
@@ -72,7 +64,7 @@ export default function AdminLogin() {
             <img 
               src={logo} 
               alt="Studio Y7" 
-              className="h-14 mx-auto mb-6" 
+              className="h-14 mx-auto mb-6 object-contain mix-blend-multiply" 
             />
           </motion.div>
 

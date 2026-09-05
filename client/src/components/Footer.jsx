@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { FaWhatsapp, FaInstagram, FaEnvelope, FaArrowUp } from "react-icons/fa";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/y7.jpg";
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -21,7 +21,7 @@ export default function Footer() {
               transition={{ duration: 0.8 }}
               src={logo}
               alt="Studio Y7"
-              className="h-10 mb-5 brightness-0 invert"
+              className="h-10 sm:h-11 w-auto object-contain mb-5 invert mix-blend-screen"
             />
             <motion.p
               initial={{ opacity: 0, y: 20 }}

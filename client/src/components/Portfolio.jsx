@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { galleryAPI } from "../services/api";
+import { getOptimizedImageUrl } from "../services/cloudinaryUpload";
 import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 // Fallback images from assets
@@ -76,7 +77,7 @@ function FilterBar({ active, onChange }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, delay: 0.15 }}
-      className="flex flex-wrap items-center justify-center gap-2 mb-16"
+      className="flex flex-wrap items-center justify-center gap-2 mb-12 sm:mb-16"
     >
       {CATEGORIES.map((cat) => {
         const isActive = cat === active;
@@ -86,7 +87,7 @@ function FilterBar({ active, onChange }) {
             onClick={() => onChange(cat)}
             whileHover={{ y: -2, scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="relative px-8 py-2.5 text-[13px] font-medium rounded-full transition-all duration-500"
+            className="relative px-5 sm:px-8 py-2 sm:py-2.5 text-xs sm:text-[13px] font-medium rounded-full transition-all duration-500"
             style={{
               color: isActive ? "#FFFFFF" : "#6B5F5A",
               background: isActive ? "linear-gradient(135deg, #C56A45 0%, #B85A38 100%)" : "transparent",
@@ -112,18 +113,17 @@ function Tile({ image, onClick }) {
       exit={{ opacity: 0, scale: 0.92 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
-      className="group relative overflow-hidden cursor-pointer mb-4 break-inside-avoid"
+      className="group relative overflow-hidden cursor-pointer mb-4 sm:mb-5 break-inside-avoid"
       style={{
         borderRadius: "20px",
         boxShadow: "0 4px 24px rgba(0, 0, 0, 0.05)",
       }}
     >
       <img
-        src={image.imageUrl}
+        src={getOptimizedImageUrl(image.imageUrl, { width: 1200, quality: 'auto:best' })}
         alt={image.title}
         loading="lazy"
         className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-[1.06]"
-        style={{ filter: "brightness(0.96) saturate(1.02) contrast(1.01)" }}
       />
 
       {/* Gradient Overlay */}
@@ -135,11 +135,11 @@ function Tile({ image, onClick }) {
       />
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-600">
-        <div className="flex items-end justify-between">
-          <div>
+      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-600">
+        <div className="flex items-end justify-between gap-2">
+          <div className="min-w-0">
             <span
-              className="inline-block text-[11px] font-medium px-4 py-2 rounded-full mb-3"
+              className="inline-block text-[10px] sm:text-[11px] font-medium px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full mb-2 sm:mb-3"
               style={{
                 color: "#FFFFFF",
                 background: "rgba(197, 106, 69, 0.95)",
@@ -149,18 +149,18 @@ function Tile({ image, onClick }) {
             >
               {image.category}
             </span>
-            <h3 className="text-white text-sm font-light">{image.title}</h3>
+            <h3 className="text-white text-xs sm:text-sm font-light truncate sm:whitespace-normal">{image.title}</h3>
           </div>
 
           <motion.div
             whileHover={{ scale: 1.12, rotate: 45 }}
-            className="w-11 h-11 rounded-full flex items-center justify-center"
+            className="w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center flex-shrink-0"
             style={{
               background: "rgba(255,255,255,0.96)",
               backdropFilter: "blur(10px)",
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="sm:w-4 sm:h-4">
               <path
                 d="M11 5L5 11M11 5H7M11 5v4"
                 stroke="#1A1614"
@@ -177,7 +177,7 @@ function Tile({ image, onClick }) {
 }
 
 function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
-  const image = images[index];
+  const image = Array.isArray(images) ? images[index] : null;
 
   useEffect(() => {
     const fn = (e) => {
@@ -193,6 +193,8 @@ function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, []);
+
+  if (!image) return null;
 
   return (
     <motion.div
@@ -213,14 +215,14 @@ function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
       />
 
       {/* Top Bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium" style={{ color: "#6B5F5A" }}>
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 pointer-events-auto">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="text-xs sm:text-sm font-medium" style={{ color: "#6B5F5A" }}>
             {index + 1} / {images.length}
           </span>
-          <span className="w-px h-4" style={{ background: "rgba(107, 95, 90, 0.2)" }} />
+          <span className="w-px h-3 sm:h-4" style={{ background: "rgba(107, 95, 90, 0.2)" }} />
           <span
-            className="text-xs font-medium px-4 py-2 rounded-full"
+            className="text-[10px] sm:text-xs font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full"
             style={{
               color: "#FFFFFF",
               background: "linear-gradient(135deg, #C56A45, #B85A38)",
@@ -231,17 +233,22 @@ function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
         </div>
         
         <motion.button
-          onClick={onClose}
+          type="button"
+          aria-label="Close lightbox"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           whileHover={{ scale: 1.1, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
-          className="w-12 h-12 rounded-full glass-strong flex items-center justify-center cursor-pointer"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-strong flex items-center justify-center cursor-pointer pointer-events-auto relative z-30 shadow-md"
         >
-          <FiX className="text-xl" style={{ color: "#1A1614" }} />
+          <FiX className="text-lg sm:text-xl" style={{ color: "#1A1614" }} />
         </motion.button>
       </div>
 
       {/* Image */}
-      <div className="relative z-10 w-full h-full flex items-center justify-center px-20 py-24" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-10 w-full h-full flex items-center justify-center px-4 py-16 sm:px-14 sm:py-20 md:px-20 md:py-24" onClick={(e) => e.stopPropagation()}>
         <AnimatePresence mode="wait" custom={direction}>
           <motion.figure
             key={image._id}
@@ -250,12 +257,12 @@ function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={(d) => ({ opacity: 0, x: d > 0 ? -100 : 100, scale: 0.9 })}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="max-h-[85vh] max-w-6xl"
+            className="max-h-[82vh] sm:max-h-[85vh] max-w-6xl"
           >
             <img
-              src={image.imageUrl}
+              src={getOptimizedImageUrl(image.imageUrl, { width: 2560, quality: 'auto:best' })}
               alt={image.title}
-              className="max-h-[85vh] max-w-full w-auto h-auto object-contain soft-shadow-lg"
+              className="max-h-[82vh] sm:max-h-[85vh] max-w-full w-auto h-auto object-contain soft-shadow-lg"
               style={{
                 borderRadius: "20px",
               }}
@@ -266,21 +273,25 @@ function Lightbox({ images, index, direction, onClose, onPrev, onNext }) {
 
       {/* Navigation */}
       <motion.button
+        type="button"
+        aria-label="Previous image"
         onClick={(e) => { e.stopPropagation(); onPrev(); }}
         whileHover={{ scale: 1.1, x: -4 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute left-8 z-10 w-14 h-14 rounded-full glass-strong flex items-center justify-center cursor-pointer"
+        className="absolute left-2 sm:left-8 z-30 w-10 h-10 sm:w-14 sm:h-14 rounded-full glass-strong flex items-center justify-center cursor-pointer pointer-events-auto shadow-md"
       >
-        <FiChevronLeft className="text-2xl" style={{ color: "#1A1614" }} />
+        <FiChevronLeft className="text-xl sm:text-2xl" style={{ color: "#1A1614" }} />
       </motion.button>
 
       <motion.button
+        type="button"
+        aria-label="Next image"
         onClick={(e) => { e.stopPropagation(); onNext(); }}
         whileHover={{ scale: 1.1, x: 4 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute right-8 z-10 w-14 h-14 rounded-full glass-strong flex items-center justify-center cursor-pointer"
+        className="absolute right-2 sm:right-8 z-30 w-10 h-10 sm:w-14 sm:h-14 rounded-full glass-strong flex items-center justify-center cursor-pointer pointer-events-auto shadow-md"
       >
-        <FiChevronRight className="text-2xl" style={{ color: "#1A1614" }} />
+        <FiChevronRight className="text-xl sm:text-2xl" style={{ color: "#1A1614" }} />
       </motion.button>
     </motion.div>
   );
@@ -293,18 +304,31 @@ export default function Portfolio() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Normalize data safely into an array
+  const normalizeGalleryData = (data) => {
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      if (Array.isArray(data.images)) return data.images;
+      if (Array.isArray(data.gallery)) return data.gallery;
+      if (Array.isArray(data.items)) return data.items;
+      if (Array.isArray(data.data)) return data.data;
+    }
+    return [];
+  };
+
   // Fetch images from API
   const fetchImages = useCallback(async () => {
     try {
       const res = await galleryAPI.getAll();
-      if (res.data && res.data.length > 0) {
-        setImages(res.data);
+      const extracted = normalizeGalleryData(res?.data !== undefined ? res.data : res);
+      if (extracted.length > 0) {
+        setImages(extracted);
       } else {
         // Use fallback images if no images in database
         setImages(DEFAULT_IMAGES);
       }
     } catch (error) {
-      console.log('Using fallback images');
+      console.log('Using fallback images', error);
       setImages(DEFAULT_IMAGES);
     } finally {
       setLoading(false);
@@ -320,7 +344,12 @@ export default function Portfolio() {
     return () => clearInterval(interval);
   }, [fetchImages]);
 
-  const filtered = activeCategory === "All" ? images : images.filter(img => img.category === activeCategory);
+  const safeImages = Array.isArray(images) ? images : DEFAULT_IMAGES;
+  const filtered = Array.isArray(safeImages)
+    ? (activeCategory === "All"
+        ? safeImages
+        : safeImages.filter((img) => img && img.category === activeCategory))
+    : [];
 
   const openLightbox = useCallback((i) => setLightboxIndex(i), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);

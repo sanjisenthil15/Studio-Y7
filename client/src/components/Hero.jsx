@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { heroAPI } from "../services/api";
+import { getOptimizedImageUrl } from "../services/cloudinaryUpload";
 import couple from "../assets/images/couple.jpg";
 
 export default function Hero() {
@@ -9,7 +10,8 @@ export default function Hero() {
 
   useEffect(() => {
     heroAPI.get().then(res => {
-      if (res.data?.imageUrl) setHeroImage(res.data.imageUrl);
+      const data = res?.data !== undefined ? res.data : res;
+      if (data?.imageUrl) setHeroImage(data.imageUrl);
     }).catch(() => {});
   }, []);
 
@@ -30,11 +32,8 @@ export default function Hero() {
     >
       {/* Left Side - Text Content with Dark Background */}
       <motion.div
-        style={{ y: contentY, opacity }}
-        className="relative z-20 w-full lg:w-[45%] flex items-center justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-20"
-        style={{ 
-          background: "#2C2826"
-        }}
+        style={{ y: contentY, opacity, background: "#2C2826" }}
+        className="relative z-20 w-full lg:w-[45%] flex items-center justify-center px-5 sm:px-10 lg:px-16 xl:px-20 py-16 sm:py-20"
       >
         <div className="max-w-lg w-full">
           {/* Pre-label */}
@@ -42,9 +41,9 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-10 flex items-center gap-4"
+            className="mb-6 sm:mb-10 flex items-center gap-4"
           >
-            <span className="block w-12 h-[1px]" style={{ background: "#C56A45" }} />
+            <span className="block w-10 sm:w-12 h-[1px]" style={{ background: "#C56A45" }} />
             <span
               className="text-[9px] tracking-[0.4em] uppercase font-semibold"
               style={{ color: "rgba(255,255,255,0.6)" }}
@@ -58,10 +57,10 @@ export default function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display mb-7"
+            className="font-display mb-5 sm:mb-7"
             style={{ 
               color: "#FFFFFF",
-              fontSize: "clamp(2.25rem, 4.5vw, 3.5rem)",
+              fontSize: "clamp(1.85rem, 5vw, 3.5rem)",
               fontWeight: 300,
               lineHeight: 1.2,
               letterSpacing: "-0.01em"
@@ -77,7 +76,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[14px] sm:text-[15px] mb-12 leading-[1.7]"
+            className="text-[13.5px] sm:text-[15px] mb-8 sm:mb-12 leading-[1.7]"
             style={{ color: "rgba(255,255,255,0.7)" }}
           >
             Premium photography for weddings, portraits,
@@ -90,13 +89,13 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap items-center gap-4"
+            className="flex flex-wrap items-center gap-3 sm:gap-4"
           >
             <motion.button
               onClick={() => document.querySelector("#portfolio")?.scrollIntoView({ behavior: "smooth" })}
               whileHover={{ y: -2, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-3.5 rounded-full text-[13px] font-medium text-white transition-all duration-300"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full text-xs sm:text-[13px] font-medium text-white transition-all duration-300 cursor-pointer"
               style={{
                 background: "#C56A45",
                 letterSpacing: "0.02em"
@@ -109,7 +108,7 @@ export default function Hero() {
               onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
               whileHover={{ y: -2, scale: 1.02, borderColor: "rgba(255,255,255,0.6)" }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-3.5 rounded-full text-[13px] font-medium transition-all duration-300"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-300 cursor-pointer"
               style={{
                 color: "#FFFFFF",
                 border: "1.5px solid rgba(255,255,255,0.35)",
@@ -129,7 +128,7 @@ export default function Hero() {
       >
         <div className="w-full h-full relative">
           <img
-            src={heroImage}
+            src={getOptimizedImageUrl(heroImage, { width: 2560, quality: 'auto:best' })}
             alt="Studio Y7 Photography"
             className="w-full h-full object-cover"
             style={{ 

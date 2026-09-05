@@ -37,13 +37,20 @@ export default function Pricing() {
   const fetchPricing = useCallback(async () => {
     try {
       const res = await pricingAPI.getAll();
-      if (res.data && res.data.length > 0) {
-        setPackages(res.data);
+      const rawData = res?.data !== undefined ? res.data : res;
+      let pkgList = [];
+      if (Array.isArray(rawData)) {
+        pkgList = rawData;
+      } else if (rawData && typeof rawData === 'object') {
+        pkgList = rawData.packages || rawData.pricing || rawData.items || rawData.data || [];
+      }
+      if (Array.isArray(pkgList) && pkgList.length > 0) {
+        setPackages(pkgList);
       } else {
         setPackages(DEFAULT_PACKAGES);
       }
     } catch (error) {
-      console.log('Using fallback pricing');
+      console.log('Using fallback pricing', error);
       setPackages(DEFAULT_PACKAGES);
     } finally {
       setLoading(false);
@@ -65,27 +72,27 @@ export default function Pricing() {
       className="relative section-padding overflow-hidden"
       style={{ background: "linear-gradient(180deg, #F5F2EE 0%, #EFE9E4 50%, #FAF8F5 100%)" }}
     >
-      <div className="mx-auto px-6 sm:px-8 max-w-7xl">
+      <div className="mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
         {/* Section Header */}
-        <div ref={ref} className="text-center mb-20">
+        <div ref={ref} className="text-center mb-12 sm:mb-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="flex items-center justify-center gap-4 mb-8"
+            className="flex items-center justify-center gap-4 mb-6 sm:mb-8"
           >
-            <span className="block w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
+            <span className="block w-10 sm:w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
             <span className="text-xs uppercase tracking-[0.3em] font-medium" style={{ color: "#6B5F5A" }}>
               Pricing
             </span>
-            <span className="block w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
+            <span className="block w-10 sm:w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-display text-[clamp(2rem,4.5vw,3.25rem)] font-light tracking-tight mb-5"
+            className="font-display text-[clamp(1.85rem,4.5vw,3.25rem)] font-light tracking-tight mb-4 sm:mb-5"
             style={{ color: "#1A1614", letterSpacing: "-0.02em" }}
           >
             Investment in Memories
@@ -95,7 +102,7 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-base sm:text-[16px] max-w-2xl mx-auto leading-[1.7]"
+            className="text-sm sm:text-base max-w-2xl mx-auto leading-[1.7]"
             style={{ color: "#6B5F5A" }}
           >
             Tailored packages to suit every celebration. Get in touch for detailed pricing.
@@ -103,7 +110,7 @@ export default function Pricing() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 sm:mb-14">
           {loading ? (
             <div className="col-span-full text-center py-20">
               <p className="text-sm" style={{ color: "#6B5F5A" }}>Loading pricing...</p>
@@ -117,7 +124,7 @@ export default function Pricing() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: i * 0.1 }}
                 whileHover={{ y: -8 }}
-                className={`relative glass-strong soft-shadow-lg rounded-[28px] p-8 transition-smooth ${
+                className={`relative glass-strong soft-shadow-lg rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 transition-smooth ${
                   pkg.recommended ? 'ring-2 ring-[#C56A45]/30' : ''
                 }`}
               >

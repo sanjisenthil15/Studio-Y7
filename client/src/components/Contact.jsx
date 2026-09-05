@@ -27,27 +27,27 @@ export default function Contact() {
       className="relative section-padding overflow-hidden"
       style={{ background: "linear-gradient(180deg, #FAF8F5 0%, #EFE9E4 100%)" }}
     >
-      <div className="mx-auto px-6 sm:px-8 max-w-7xl">
+      <div className="mx-auto px-4 sm:px-6 md:px-8 max-w-7xl">
         {/* Section Header */}
-        <div ref={ref} className="text-center mb-20">
+        <div ref={ref} className="text-center mb-12 sm:mb-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="flex items-center justify-center gap-4 mb-8"
+            className="flex items-center justify-center gap-4 mb-6 sm:mb-8"
           >
-            <span className="block w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
+            <span className="block w-10 sm:w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
             <span className="text-xs uppercase tracking-[0.3em] font-medium" style={{ color: "#6B5F5A" }}>
               Get in Touch
             </span>
-            <span className="block w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
+            <span className="block w-10 sm:w-12 h-px bg-gradient-to-r from-transparent via-[#C56A45]/30 to-transparent" />
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-display text-[clamp(2rem,4.5vw,3.25rem)] font-light tracking-tight mb-5"
+            className="font-display text-[clamp(1.85rem,4.5vw,3.25rem)] font-light tracking-tight mb-4 sm:mb-5"
             style={{ color: "#1A1614", letterSpacing: "-0.02em" }}
           >
             Let's Start a
@@ -56,7 +56,7 @@ export default function Contact() {
           </motion.h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-start">
           {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
