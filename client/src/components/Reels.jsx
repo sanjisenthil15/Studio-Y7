@@ -247,90 +247,103 @@ export default function Reels() {
 
           {/* Videos Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
-            {displayVideos.map((video, idx) => {
-              const thumbnail = getVideoThumbnailUrl(video);
-              const isYouTube = video.sourceType === "youtube" || (video.videoUrl && (video.videoUrl.includes("youtube.com") || video.videoUrl.includes("youtu.be")));
-
-              return (
-                <motion.div
-                  key={video._id || idx}
-                  initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                  onClick={() => setSelectedVideo(video)}
-                  className="group relative rounded-[24px] overflow-hidden cursor-pointer soft-shadow transition-transform duration-500 hover:-translate-y-1.5"
+            {loading ? (
+              [0, 1, 2].map((idx) => (
+                <div
+                  key={idx}
+                  className="rounded-[24px] overflow-hidden skeleton-dark"
                   style={{
-                    background: "#1A1614",
                     aspectRatio: "16/10",
-                    border: "1px solid rgba(255, 255, 255, 0.4)"
+                    border: "1px solid rgba(255, 255, 255, 0.08)"
                   }}
-                >
-                  {/* Poster Thumbnail Image */}
-                  <div className="absolute inset-0 w-full h-full overflow-hidden">
-                    {thumbnail ? (
-                      <motion.img
-                        src={thumbnail}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                        style={{ filter: "brightness(0.85)" }}
-                        whileHover={{ scale: 1.08 }}
-                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#241E1B] to-[#120F0E]">
-                        <FiFilm className="text-4xl text-[#C56A45]/40" />
-                      </div>
-                    )}
-                  </div>
+                />
+              ))
+            ) : (
+              displayVideos.map((video, idx) => {
+                const thumbnail = getVideoThumbnailUrl(video);
+                const isYouTube = video.sourceType === "youtube" || (video.videoUrl && (video.videoUrl.includes("youtube.com") || video.videoUrl.includes("youtu.be")));
 
-                  {/* Dark Gradient Overlay */}
-                  <div
-                    className="absolute inset-0 transition-opacity duration-500"
+                return (
+                  <motion.div
+                    key={video._id || idx}
+                    initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={() => setSelectedVideo(video)}
+                    className="group relative rounded-[24px] overflow-hidden cursor-pointer soft-shadow transition-transform duration-500 hover:-translate-y-1.5"
                     style={{
-                      background: "linear-gradient(to top, rgba(18,15,14,0.92) 0%, rgba(18,15,14,0.3) 50%, rgba(18,15,14,0.1) 100%)",
+                      background: "#1A1614",
+                      aspectRatio: "16/10",
+                      border: "1px solid rgba(255, 255, 255, 0.4)"
                     }}
-                  />
-
-                  {/* Play Button Icon */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <motion.div
-                      whileHover={{ scale: 1.15 }}
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-white shadow-xl transition-all duration-300 group-hover:scale-110"
-                      style={{
-                        background: "rgba(197, 106, 69, 0.88)",
-                        backdropFilter: "blur(12px)",
-                        border: "2px solid rgba(255, 255, 255, 0.6)"
-                      }}
-                    >
-                      <FiPlay className="text-xl sm:text-2xl ml-1" />
-                    </motion.div>
-                  </div>
-
-                  {/* Card Bottom Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 z-10">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-md">
-                        {isYouTube ? "YouTube" : "Cinematic 4K"}
-                      </span>
+                  >
+                    {/* Poster Thumbnail Image */}
+                    <div className="absolute inset-0 w-full h-full overflow-hidden">
+                      {thumbnail ? (
+                        <motion.img
+                          src={thumbnail}
+                          alt={video.title}
+                          className="w-full h-full object-cover"
+                          style={{ filter: "brightness(0.85)" }}
+                          whileHover={{ scale: 1.08 }}
+                          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#241E1B] to-[#120F0E]">
+                          <FiFilm className="text-4xl text-[#C56A45]/40" />
+                        </div>
+                      )}
                     </div>
 
-                    <h3
-                      className="font-display text-white text-base sm:text-lg font-light leading-snug line-clamp-1 group-hover:text-[#E89370] transition-colors"
-                      style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
-                    >
-                      {video.title}
-                    </h3>
+                    {/* Dark Gradient Overlay */}
+                    <div
+                      className="absolute inset-0 transition-opacity duration-500"
+                      style={{
+                        background: "linear-gradient(to top, rgba(18,15,14,0.92) 0%, rgba(18,15,14,0.3) 50%, rgba(18,15,14,0.1) 100%)",
+                      }}
+                    />
 
-                    {video.description && (
-                      <p className="text-white/75 text-xs font-light line-clamp-1 mt-1">
-                        {video.description}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
+                    {/* Play Button Icon */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <motion.div
+                        whileHover={{ scale: 1.15 }}
+                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-white shadow-xl transition-all duration-300 group-hover:scale-110"
+                        style={{
+                          background: "rgba(197, 106, 69, 0.88)",
+                          backdropFilter: "blur(12px)",
+                          border: "2px solid rgba(255, 255, 255, 0.6)"
+                        }}
+                      >
+                        <FiPlay className="text-xl sm:text-2xl ml-1" />
+                      </motion.div>
+                    </div>
+
+                    {/* Card Bottom Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 z-10">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-md">
+                          {isYouTube ? "YouTube" : "Cinematic 4K"}
+                        </span>
+                      </div>
+
+                      <h3
+                        className="font-display text-white text-base sm:text-lg font-light leading-snug line-clamp-1 group-hover:text-[#E89370] transition-colors"
+                        style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
+                      >
+                        {video.title}
+                      </h3>
+
+                      {video.description && (
+                        <p className="text-white/75 text-xs font-light line-clamp-1 mt-1">
+                          {video.description}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
           </div>
         </div>
       </section>

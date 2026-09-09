@@ -5,14 +5,29 @@ import { getOptimizedImageUrl } from "../services/cloudinaryUpload";
 import couple from "../assets/images/couple.jpg";
 
 export default function Hero() {
-  const [heroImage, setHeroImage] = useState(couple);
+  const [heroImage, setHeroImage] = useState(null);
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    heroAPI.get().then(res => {
-      const data = res?.data !== undefined ? res.data : res;
-      if (data?.imageUrl) setHeroImage(data.imageUrl);
-    }).catch(() => {});
+    let isMounted = true;
+    heroAPI.get()
+      .then(res => {
+        if (!isMounted) return;
+        const data = res?.data !== undefined ? res.data : res;
+        if (data?.imageUrl) {
+          setHeroImage(data.imageUrl);
+        } else {
+          setHeroImage(couple);
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setHeroImage(couple);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -123,23 +138,30 @@ export default function Hero() {
 
       {/* Right Side - Hero Image */}
       <motion.div 
-        style={{ y: imageY }} 
-        className="absolute lg:relative right-0 top-0 w-full lg:w-[55%] h-full z-10 opacity-25 lg:opacity-100"
+        style={{ y: imageY, background: "#2C2826" }} 
+        className="absolute lg:relative right-0 top-0 w-full lg:w-[55%] h-full z-10 opacity-25 lg:opacity-100 overflow-hidden"
       >
         <div className="w-full h-full relative">
-          <img
-            src={getOptimizedImageUrl(heroImage, { width: 2560, quality: 'auto:best' })}
-            alt="Studio Y7 Photography"
-            className="w-full h-full object-cover"
-            style={{ 
-              objectPosition: "center center"
-            }}
-            loading="eager"
-          />
+          {heroImage ? (
+            <motion.img
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              src={getOptimizedImageUrl(heroImage, { width: 2560, quality: 'auto:best' })}
+              alt="Studio Y7 Photography"
+              className="w-full h-full object-cover"
+              style={{ 
+                objectPosition: "center center"
+              }}
+              loading="eager"
+            />
+          ) : (
+            <div className="w-full h-full skeleton-dark" />
+          )}
           
           {/* Gradient blend on mobile */}
           <div
-            className="absolute inset-0 lg:hidden"
+            className="absolute inset-0 lg:hidden pointer-events-none"
             style={{
               background: "linear-gradient(to right, #2C2826 0%, rgba(44,40,38,0.8) 30%, transparent 70%)",
             }}

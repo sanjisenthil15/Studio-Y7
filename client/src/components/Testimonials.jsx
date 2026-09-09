@@ -153,8 +153,13 @@ export default function Testimonials() {
 
         {/* Testimonials Grid */}
         {loading ? (
-          <div className="text-center py-20">
-            <p className="text-sm" style={{ color: "#6B5F5A" }}>Loading testimonials...</p>
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            {[0, 1, 2].map((idx) => (
+              <div
+                key={idx}
+                className="glass-strong soft-shadow-lg rounded-[28px] p-7 min-h-[220px] skeleton"
+              />
+            ))}
           </div>
         ) : testimonials.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-6 mb-16">

@@ -6,7 +6,7 @@ import { getOptimizedImageUrl } from "../services/cloudinaryUpload";
 import defaultStoryImage from "../assets/images/couple.jpg";
 
 export default function About({ customImage = null }) {
-  const [storyImage, setStoryImage] = useState(customImage || defaultStoryImage);
+  const [storyImage, setStoryImage] = useState(customImage || null);
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -16,21 +16,29 @@ export default function About({ customImage = null }) {
       return;
     }
 
+    let isMounted = true;
     const fetchStoryContent = async () => {
       try {
         const res = await contentAPI.get('about');
+        if (!isMounted) return;
         const data = res?.data !== undefined ? res.data : res;
         const content = data?.content || data;
         const img = content?.storyImage || content?.imageUrl || content?.secure_url || content?.image;
         if (img) {
           setStoryImage(img);
+        } else {
+          setStoryImage(defaultStoryImage);
         }
       } catch (err) {
-        // Fallback to default asset if not yet set in database
+        if (!isMounted) return;
+        setStoryImage(defaultStoryImage);
       }
     };
 
     fetchStoryContent();
+    return () => {
+      isMounted = false;
+    };
   }, [customImage]);
 
   return (
@@ -88,14 +96,20 @@ export default function About({ customImage = null }) {
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             className="relative max-w-md lg:max-w-none mx-auto w-full"
           >
-            <div className="relative overflow-hidden rounded-[20px] sm:rounded-[28px] shadow-2xl" style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.1)" }}>
-              <img
-                src={typeof storyImage === 'string' && storyImage.includes('http') ? getOptimizedImageUrl(storyImage, { width: 1600, quality: 'auto:best' }) : storyImage}
-                alt="Studio Y7 Story"
-                className="w-full h-auto object-cover"
-                style={{ aspectRatio: "4/5" }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
+            <div className="relative overflow-hidden rounded-[20px] sm:rounded-[28px] shadow-2xl bg-[#EBE6DF]" style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.1)", aspectRatio: "4/5" }}>
+              {storyImage ? (
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  src={typeof storyImage === 'string' && storyImage.includes('http') ? getOptimizedImageUrl(storyImage, { width: 1600, quality: 'auto:best' }) : storyImage}
+                  alt="Studio Y7 Story"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full skeleton" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent pointer-events-none" />
             </div>
           </motion.div>
 

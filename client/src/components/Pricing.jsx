@@ -112,9 +112,12 @@ export default function Pricing() {
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 sm:mb-14">
           {loading ? (
-            <div className="col-span-full text-center py-20">
-              <p className="text-sm" style={{ color: "#6B5F5A" }}>Loading pricing...</p>
-            </div>
+            [0, 1, 2].map((idx) => (
+              <div
+                key={idx}
+                className="glass-strong soft-shadow-lg rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 min-h-[420px] skeleton"
+              />
+            ))
           ) : (
             packages.map((pkg, i) => (
               <motion.div

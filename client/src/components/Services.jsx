@@ -418,95 +418,106 @@ export default function Services() {
 
           {/* Services Responsive Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 auto-rows-[170px] sm:auto-rows-[210px] md:auto-rows-[250px]">
-            {displayServices.map((service, i) => {
-              const isFeatured = i === 0;
-              const spanClass = isFeatured 
-                ? "col-span-2 row-span-1 sm:row-span-2 lg:col-span-2 lg:row-span-2 min-h-[200px] sm:min-h-[360px] lg:min-h-[520px]" 
-                : "col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px]";
-              const imgSrc = service.imageUrl || service.image;
+            {loading ? (
+              <>
+                <div className="col-span-2 row-span-1 sm:row-span-2 lg:col-span-2 lg:row-span-2 min-h-[200px] sm:min-h-[360px] lg:min-h-[520px] rounded-[20px] sm:rounded-[24px] skeleton" />
+                <div className="col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px] rounded-[20px] sm:rounded-[24px] skeleton" />
+                <div className="col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px] rounded-[20px] sm:rounded-[24px] skeleton" />
+                <div className="col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px] rounded-[20px] sm:rounded-[24px] skeleton" />
+                <div className="col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px] rounded-[20px] sm:rounded-[24px] skeleton" />
+                <div className="col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px] rounded-[20px] sm:rounded-[24px] skeleton" />
+              </>
+            ) : (
+              displayServices.map((service, i) => {
+                const isFeatured = i === 0;
+                const spanClass = isFeatured 
+                  ? "col-span-2 row-span-1 sm:row-span-2 lg:col-span-2 lg:row-span-2 min-h-[200px] sm:min-h-[360px] lg:min-h-[520px]" 
+                  : "col-span-1 min-h-[170px] sm:min-h-[210px] md:min-h-[250px]";
+                const imgSrc = service.imageUrl || service.image;
 
-              return (
-                <motion.div
-                  key={service._id || i}
-                  initial={{ opacity: 0, y: 30, scale: 0.97 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.7, delay: (i % 6) * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                  onClick={() => handleServiceCardClick(service)}
-                  className={`group relative overflow-hidden rounded-[20px] sm:rounded-[24px] cursor-pointer ${spanClass}`}
-                  style={{ 
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-                    border: "1px solid rgba(255,255,255,0.4)"
-                  }}
-                >
-                  {/* Background Image */}
-                  <div className="absolute inset-0 w-full h-full">
-                    <motion.img
-                      src={typeof imgSrc === 'string' && imgSrc.includes('http') ? getOptimizedImageUrl(imgSrc, { width: 1600, quality: 'auto:best' }) : imgSrc}
-                      alt={service.title}
-                      className="w-full h-full object-cover"
-                      style={{ filter: "brightness(0.9) saturate(1.1)" }}
-                      whileHover={{ scale: 1.08 }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  </div>
-
-                  {/* Dark Gradient Overlay */}
-                  <div
-                    className="absolute inset-0 transition-opacity duration-700"
-                    style={{
-                      background: "linear-gradient(to top, rgba(26,22,20,0.92) 0%, rgba(26,22,20,0.55) 45%, rgba(26,22,20,0.25) 70%, transparent 100%)",
+                return (
+                  <motion.div
+                    key={service._id || i}
+                    initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.7, delay: (i % 6) * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    onClick={() => handleServiceCardClick(service)}
+                    className={`group relative overflow-hidden rounded-[20px] sm:rounded-[24px] cursor-pointer ${spanClass}`}
+                    style={{ 
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+                      border: "1px solid rgba(255,255,255,0.4)"
                     }}
-                  />
-
-                  {/* Hover Gradient */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                    style={{
-                      background: "linear-gradient(to top, rgba(197,106,69,0.7) 0%, rgba(197,106,69,0.3) 50%, transparent 100%)",
-                    }}
-                  />
-
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-5 md:p-6 z-10">
-                    <div className="flex items-end justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 
-                          className="font-display text-white text-sm sm:text-lg md:text-[22px] font-light leading-tight group-hover:translate-y-[-2px] transition-transform duration-500 line-clamp-1"
-                          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
-                        >
-                          {service.title}
-                        </h3>
-                        {service.description && (
-                          <p className="text-white/80 text-[11px] sm:text-xs mt-1 font-light line-clamp-2 leading-relaxed max-w-md">
-                            {service.description}
-                          </p>
-                        )}
-                      </div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.15, rotate: 45 }}
-                        transition={{ duration: 0.3 }}
-                        className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{
-                          background: "rgba(255,255,255,0.95)",
-                          backdropFilter: "blur(10px)",
-                          boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
-                        }}
-                      >
-                        <FiArrowUpRight className="text-xs sm:text-base md:text-lg" style={{ color: "#1A1614" }} />
-                      </motion.div>
+                  >
+                    {/* Background Image */}
+                    <div className="absolute inset-0 w-full h-full">
+                      <motion.img
+                        src={typeof imgSrc === 'string' && imgSrc.includes('http') ? getOptimizedImageUrl(imgSrc, { width: 1600, quality: 'auto:best' }) : imgSrc}
+                        alt={service.title}
+                        className="w-full h-full object-cover"
+                        style={{ filter: "brightness(0.9) saturate(1.1)" }}
+                        whileHover={{ scale: 1.08 }}
+                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      />
                     </div>
-                  </div>
 
-                  {/* Glass Border on Hover */}
-                  <div 
-                    className="absolute inset-0 rounded-[20px] sm:rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ border: "1px solid rgba(255,255,255,0.5)" }} 
-                  />
-                </motion.div>
-              );
-            })}
+                    {/* Dark Gradient Overlay */}
+                    <div
+                      className="absolute inset-0 transition-opacity duration-700"
+                      style={{
+                        background: "linear-gradient(to top, rgba(26,22,20,0.92) 0%, rgba(26,22,20,0.55) 45%, rgba(26,22,20,0.25) 70%, transparent 100%)",
+                      }}
+                    />
+
+                    {/* Hover Gradient */}
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                      style={{
+                        background: "linear-gradient(to top, rgba(197,106,69,0.7) 0%, rgba(197,106,69,0.3) 50%, transparent 100%)",
+                      }}
+                    />
+
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3.5 sm:p-5 md:p-6 z-10">
+                      <div className="flex items-end justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h3 
+                            className="font-display text-white text-sm sm:text-lg md:text-[22px] font-light leading-tight group-hover:translate-y-[-2px] transition-transform duration-500 line-clamp-1"
+                            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
+                          >
+                            {service.title}
+                          </h3>
+                          {service.description && (
+                            <p className="text-white/80 text-[11px] sm:text-xs mt-1 font-light line-clamp-2 leading-relaxed max-w-md">
+                              {service.description}
+                            </p>
+                          )}
+                        </div>
+
+                        <motion.div
+                          whileHover={{ scale: 1.15, rotate: 45 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{
+                            background: "rgba(255,255,255,0.95)",
+                            backdropFilter: "blur(10px)",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
+                          }}
+                        >
+                          <FiArrowUpRight className="text-xs sm:text-base md:text-lg" style={{ color: "#1A1614" }} />
+                        </motion.div>
+                      </div>
+                    </div>
+
+                    {/* Glass Border on Hover */}
+                    <div 
+                      className="absolute inset-0 rounded-[20px] sm:rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ border: "1px solid rgba(255,255,255,0.5)" }} 
+                    />
+                  </motion.div>
+                );
+              })
+            )}
           </div>
 
           {/* CTA */}

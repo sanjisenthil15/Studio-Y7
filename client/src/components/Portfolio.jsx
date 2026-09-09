@@ -390,8 +390,21 @@ export default function Portfolio() {
               className="columns-1 sm:columns-2 lg:columns-3 gap-5"
             >
               {loading ? (
-                <div className="col-span-full text-center py-20">
-                  <p className="text-sm" style={{ color: "#6B5F5A" }}>Loading gallery...</p>
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
+                  {[
+                    "aspect-[3/4]",
+                    "aspect-[4/3]",
+                    "aspect-[1/1]",
+                    "aspect-[3/4]",
+                    "aspect-[4/5]",
+                    "aspect-[16/9]"
+                  ].map((aspect, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-full rounded-[20px] mb-4 sm:mb-5 break-inside-avoid skeleton ${aspect}`}
+                      style={{ minHeight: "180px" }}
+                    />
+                  ))}
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="col-span-full text-center py-20">
